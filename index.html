@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Conversor de Temperatura</title>
+  <link rel="stylesheet" href="./assets/styles.css">
+</head>
+<body>
+  <header class="app-header">
+    <h1>Conversor de Temperatura</h1>
+  </header>
+  <main class="container">
+    <section class="panel">
+      <h2 class="sr-only">De</h2>
+      <div class="field">
+        <label for="fromValue">Valor</label>
+        <input id="fromValue" type="number" inputmode="decimal" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="fromUnit">Unidade</label>
+        <select id="fromUnit">
+          <option value="" selected>Selecione</option>
+        </select>
+      </div>
+    </section>
+    <section class="panel">
+      <h2 class="sr-only">Para</h2>
+      <div class="field">
+        <label for="toValue">Valor</label>
+        <input id="toValue" type="number" inputmode="decimal" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="toUnit">Unidade</label>
+        <select id="toUnit">
+          <option value="" selected>Selecione</option>
+        </select>
+      </div>
+    </section>
+  </main>
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>
