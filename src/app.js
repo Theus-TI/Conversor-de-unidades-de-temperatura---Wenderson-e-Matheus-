@@ -16,6 +16,14 @@ window.addEventListener('DOMContentLoaded', () => {
     const v = parseFloat(el.value);
     return Number.isFinite(v) ? v : null;
   };
+
+  // format output only (no grouping, up to 4 decimals)
+  const numberFormatter = new Intl.NumberFormat(undefined, {
+    useGrouping: false,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 4,
+  });
+  const formatNumber = (n) => numberFormatter.format(n);
   const flash = (el) => { el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); };
   const setStatus = (msg) => { if (statusEl) statusEl.textContent = msg || ''; };
   const setInvalid = (el, invalid) => {
@@ -52,7 +60,7 @@ window.addEventListener('DOMContentLoaded', () => {
             setInvalid(fromValue, true);
             setStatus('Kelvin não pode ser negativo.');
           } else {
-            toValue.value = result;
+            toValue.value = formatNumber(result);
             setInvalid(fromValue, false);
             setStatus('');
             flash(toValue);
@@ -75,7 +83,7 @@ window.addEventListener('DOMContentLoaded', () => {
             setInvalid(toValue, true);
             setStatus('Kelvin não pode ser negativo.');
           } else {
-            fromValue.value = result;
+            fromValue.value = formatNumber(result);
             setInvalid(toValue, false);
             setStatus('');
             flash(fromValue);
