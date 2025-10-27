@@ -16,8 +16,15 @@ export const fromCelsius = (valC, unit) => {
   }
 };
 
+const PRECISION = 1e8; // 8 casas decimais
+const precise = (x) => {
+  if (!Number.isFinite(x)) return x;
+  const y = Math.round((x + Number.EPSILON) * PRECISION) / PRECISION;
+  return Object.is(y, -0) ? 0 : y;
+};
+
 export const convert = (value, from, to) => {
-  if (from === to) return value;
+  if (from === to) return precise(value);
   const c = toCelsius(value, from);
-  return fromCelsius(c, to);
+  return precise(fromCelsius(c, to));
 };
