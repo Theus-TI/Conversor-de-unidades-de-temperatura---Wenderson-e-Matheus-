@@ -5,6 +5,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const toValue = $('#toValue');
   const fromUnit = $('#fromUnit');
   const toUnit = $('#toUnit');
+  const swapButton = document.querySelector('#swapButton');
 
   const cToF = (c) => (c * 9/5) + 32;
   const fToC = (f) => (f - 32) * 5/9;
@@ -35,6 +36,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const v = parseFloat(el.value);
     return Number.isFinite(v) ? v : null;
   };
+  const flash = (el) => { el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); };
 
   const updateOpposite = (source) => {
     if (isUpdating) return;
@@ -50,6 +52,7 @@ window.addEventListener('DOMContentLoaded', () => {
           toValue.value = '';
         } else {
           toValue.value = convert(val, from, to);
+          flash(toValue);
         }
       } else {
         const val = parse(toValue);
@@ -59,6 +62,7 @@ window.addEventListener('DOMContentLoaded', () => {
           fromValue.value = '';
         } else {
           fromValue.value = convert(val, to, from);
+          flash(fromValue);
         }
       }
     } finally {
@@ -78,4 +82,18 @@ window.addEventListener('DOMContentLoaded', () => {
   };
   fromUnit.addEventListener('change', recalcOnUnitsChange);
   toUnit.addEventListener('change', recalcOnUnitsChange);
-});
+  if (swapButton) {
+    swapButton.addEventListener('click', () => {
+      if (isUpdating) return;
+      const u1 = fromUnit.value; const u2 = toUnit.value;
+      fromUnit.value = u2; toUnit.value = u1;
+      const v1 = parse(fromValue); const v2 = parse(toValue);
+      if (v1 !== null) {
+        updateOpposite('from');
+      } else if (v2 !== null) {
+        updateOpposite('to');
+      }
+      flash(fromValue); flash(toValue);
+    });
+  }
+})
