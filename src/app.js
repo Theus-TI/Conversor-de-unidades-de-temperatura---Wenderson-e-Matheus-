@@ -5,15 +5,38 @@ window.addEventListener('DOMContentLoaded', () => {
   const toValue = $('#toValue');
   const fromUnit = $('#fromUnit');
   const toUnit = $('#toUnit');
+  const swapButton = document.querySelector('#swapButton');
 
   const cToF = (c) => (c * 9/5) + 32;
   const fToC = (f) => (f - 32) * 5/9;
+  const toCelsius = (val, unit) => {
+    switch (unit) {
+      case 'C': return val;
+      case 'F': return (val - 32) * 5/9;
+      case 'K': return val - 273.15;
+      default: return NaN;
+    }
+  };
+  const fromCelsius = (valC, unit) => {
+    switch (unit) {
+      case 'C': return valC;
+      case 'F': return (valC * 9/5) + 32;
+      case 'K': return valC + 273.15;
+      default: return NaN;
+    }
+  };
+  const convert = (value, from, to) => {
+    if (from === to) return value;
+    const c = toCelsius(value, from);
+    return fromCelsius(c, to);
+  };
 
   let isUpdating = false;
   const parse = (el) => {
     const v = parseFloat(el.value);
     return Number.isFinite(v) ? v : null;
   };
+  const flash = (el) => { el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); };
 
   const updateOpposite = (source) => {
     if (isUpdating) return;
@@ -21,26 +44,26 @@ window.addEventListener('DOMContentLoaded', () => {
     try {
       const from = fromUnit.value;
       const to = toUnit.value;
-      if ((from === 'C' && to === 'F') || (from === 'F' && to === 'C')) {
-        if (source === 'from') {
-          const val = parse(fromValue);
-          if (val === null) {
-            toValue.value = '';
-          } else {
-            toValue.value = from === 'C' ? cToF(val) : fToC(val);
-          }
+      if (source === 'from') {
+        const val = parse(fromValue);
+        if (val === null) {
+          toValue.value = '';
+        } else if (from === 'K' && val < 0) {
+          toValue.value = '';
         } else {
-          const val = parse(toValue);
-          if (val === null) {
-            fromValue.value = '';
-          } else {
-            fromValue.value = to === 'C' ? fToC(val) : cToF(val);
-          }
+          toValue.value = convert(val, from, to);
+          flash(toValue);
         }
       } else {
-        // fora do escopo deste commit
-        if (source === 'from') toValue.value = '';
-        if (source === 'to') fromValue.value = '';
+        const val = parse(toValue);
+        if (val === null) {
+          fromValue.value = '';
+        } else if (to === 'K' && val < 0) {
+          fromValue.value = '';
+        } else {
+          fromValue.value = convert(val, to, from);
+          flash(fromValue);
+        }
       }
     } finally {
       isUpdating = false;
@@ -49,4 +72,28 @@ window.addEventListener('DOMContentLoaded', () => {
 
   fromValue.addEventListener('input', () => updateOpposite('from'));
   toValue.addEventListener('input', () => updateOpposite('to'));
-});
+  const recalcOnUnitsChange = () => {
+    const fv = parse(fromValue);
+    const tv = parse(toValue);
+    if (fv !== null) return updateOpposite('from');
+    if (tv !== null) return updateOpposite('to');
+    fromValue.value = '';
+    toValue.value = '';
+  };
+  fromUnit.addEventListener('change', recalcOnUnitsChange);
+  toUnit.addEventListener('change', recalcOnUnitsChange);
+  if (swapButton) {
+    swapButton.addEventListener('click', () => {
+      if (isUpdating) return;
+      const u1 = fromUnit.value; const u2 = toUnit.value;
+      fromUnit.value = u2; toUnit.value = u1;
+      const v1 = parse(fromValue); const v2 = parse(toValue);
+      if (v1 !== null) {
+        updateOpposite('from');
+      } else if (v2 !== null) {
+        updateOpposite('to');
+      }
+      flash(fromValue); flash(toValue);
+    });
+  }
+})
