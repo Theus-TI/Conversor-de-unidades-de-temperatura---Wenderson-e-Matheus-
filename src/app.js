@@ -6,6 +6,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const fromUnit = $('#fromUnit');
   const toUnit = $('#toUnit');
   const swapButton = document.querySelector('#swapButton');
+  const statusEl = document.querySelector('#status');
 
   const cToF = (c) => (c * 9/5) + 32;
   const fToC = (f) => (f - 32) * 5/9;
@@ -37,6 +38,17 @@ window.addEventListener('DOMContentLoaded', () => {
     return Number.isFinite(v) ? v : null;
   };
   const flash = (el) => { el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); };
+  const setStatus = (msg) => { if (statusEl) statusEl.textContent = msg || ''; };
+  const setInvalid = (el, invalid) => {
+    if (!el) return;
+    if (invalid) {
+      el.classList.add('invalid');
+      el.setAttribute('aria-invalid', 'true');
+    } else {
+      el.classList.remove('invalid');
+      el.removeAttribute('aria-invalid');
+    }
+  };
 
   const updateOpposite = (source) => {
     if (isUpdating) return;
@@ -48,21 +60,47 @@ window.addEventListener('DOMContentLoaded', () => {
         const val = parse(fromValue);
         if (val === null) {
           toValue.value = '';
+          setInvalid(fromValue, false);
+          setStatus('');
         } else if (from === 'K' && val < 0) {
           toValue.value = '';
+          setInvalid(fromValue, true);
+          setStatus('Kelvin não pode ser negativo.');
         } else {
-          toValue.value = convert(val, from, to);
-          flash(toValue);
+          const result = convert(val, from, to);
+          if (to === 'K' && result < 0) {
+            toValue.value = '';
+            setInvalid(fromValue, true);
+            setStatus('Kelvin não pode ser negativo.');
+          } else {
+            toValue.value = result;
+            setInvalid(fromValue, false);
+            setStatus('');
+            flash(toValue);
+          }
         }
       } else {
         const val = parse(toValue);
         if (val === null) {
           fromValue.value = '';
+          setInvalid(toValue, false);
+          setStatus('');
         } else if (to === 'K' && val < 0) {
           fromValue.value = '';
+          setInvalid(toValue, true);
+          setStatus('Kelvin não pode ser negativo.');
         } else {
-          fromValue.value = convert(val, to, from);
-          flash(fromValue);
+          const result = convert(val, to, from);
+          if (from === 'K' && result < 0) {
+            fromValue.value = '';
+            setInvalid(toValue, true);
+            setStatus('Kelvin não pode ser negativo.');
+          } else {
+            fromValue.value = result;
+            setInvalid(toValue, false);
+            setStatus('');
+            flash(fromValue);
+          }
         }
       }
     } finally {
