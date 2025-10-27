@@ -1,3 +1,4 @@
+import { convert } from './conversion.js';
 const $ = (sel) => document.querySelector(sel);
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -8,29 +9,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const swapButton = document.querySelector('#swapButton');
   const statusEl = document.querySelector('#status');
 
-  const cToF = (c) => (c * 9/5) + 32;
-  const fToC = (f) => (f - 32) * 5/9;
-  const toCelsius = (val, unit) => {
-    switch (unit) {
-      case 'C': return val;
-      case 'F': return (val - 32) * 5/9;
-      case 'K': return val - 273.15;
-      default: return NaN;
-    }
-  };
-  const fromCelsius = (valC, unit) => {
-    switch (unit) {
-      case 'C': return valC;
-      case 'F': return (valC * 9/5) + 32;
-      case 'K': return valC + 273.15;
-      default: return NaN;
-    }
-  };
-  const convert = (value, from, to) => {
-    if (from === to) return value;
-    const c = toCelsius(value, from);
-    return fromCelsius(c, to);
-  };
+  
 
   let isUpdating = false;
   const parse = (el) => {
