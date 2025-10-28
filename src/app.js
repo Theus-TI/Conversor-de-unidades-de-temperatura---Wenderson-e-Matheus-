@@ -49,6 +49,9 @@ window.addEventListener('DOMContentLoaded', () => {
   const loadTheme = () => localStorage.getItem(THEME_KEY) || getSystemPref();
   const setTheme = (t) => { localStorage.setItem(THEME_KEY, t); applyTheme(t); };
   setTheme(loadTheme());
+  // Botão de alternância de tema:
+  // - Lê o tema atual (dark/light)
+  // - Alterna e salva em localStorage para persistência
   if (themeToggle) {
     themeToggle.addEventListener('click', () => {
       const current = document.documentElement.getAttribute('data-theme') || loadTheme();
