@@ -12,7 +12,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const historyList = document.querySelector('#historyList');
   const clearHistoryBtn = document.querySelector('#clearHistory');
 
-  
+
 
   let isUpdating = false;
   const parse = (el) => {
@@ -120,7 +120,7 @@ window.addEventListener('DOMContentLoaded', () => {
         } else if (from === 'K' && val < 0) {
           toValue.value = '';
           setInvalid(fromValue, true);
-          setStatus('Kelvin não pode ser negativo.');
+          setStatus('Temperatura em Kelvin não pode ser negativo.');
         } else {
           const result = convert(val, from, to);
           if (to === 'K' && result < 0) {
