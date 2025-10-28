@@ -1,0 +1,41 @@
+{
+  "name": "conversor-temperatura",
+  "version": "1.0.0",
+  "description": "Um conversor de temperatura moderno e acessível",
+  "type": "module",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "http-server -p 3000",
+    "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js",
+    "test:watch": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --watchAll",
+    "format": "prettier --write \"**/*.{js,json,md,html,css}\"",
+    "lint": "eslint \"src/**/*.js\"",
+    "prepare": "husky install"
+  },
+  "keywords": [
+    "temperature",
+    "converter",
+    "celsius",
+    "fahrenheit",
+    "kelvin",
+    "javascript",
+    "accessibility"
+  ],
+  "author": "Seu Nome <email@exemplo.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^8.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-import": "^2.27.5",
+    "http-server": "^14.1.1",
+    "husky": "^8.0.3",
+    "jest": "^29.0.0",
+    "prettier": "^3.0.0"
+  },
+  "browserslist": [
+    "last 2 Chrome versions",
+    "last 2 Firefox versions",
+    "last 2 Safari versions",
+    "last 2 Edge versions"
+  ]
+}
