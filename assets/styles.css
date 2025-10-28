@@ -39,3 +39,8 @@ input.invalid{border-color:var(--error)}
 .history-list li{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:8px 12px}
 .clear-btn{cursor:pointer;padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:transparent;color:var(--fg)}
 .clear-btn:hover{background:rgba(255,255,255,.06)}
+
+/* reduzir movimento para acessibilidade */
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important}
+}
