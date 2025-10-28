@@ -6,28 +6,29 @@ window.addEventListener('DOMContentLoaded', () => {
   const toValue = $('#toValue');
   const fromUnit = $('#fromUnit');
   const toUnit = $('#toUnit');
-  const swapButton = document.querySelector('#swapButton');
-  const statusEl = document.querySelector('#status');
-  const themeToggle = document.querySelector('#themeToggle');
-  const historyList = document.querySelector('#historyList');
-  const clearHistoryBtn = document.querySelector('#clearHistory');
+  const swapButton = $('#swapButton');
+  const statusEl = $('#status');
+  const themeToggle = $('#themeToggle');
+  const historyList = $('#historyList');
+  const clearHistoryBtn = $('#clearHistory');
 
-
+  if (!fromValue || !toValue || !fromUnit || !toUnit) return;
 
   let isUpdating = false;
+
   const parse = (el) => {
     const raw = (el.value || '').trim().replace(',', '.');
     const v = parseFloat(raw);
     return Number.isFinite(v) ? v : null;
   };
 
-  // format output only (no grouping, up to 4 decimals)
   const numberFormatter = new Intl.NumberFormat(undefined, {
     useGrouping: false,
     minimumFractionDigits: 0,
     maximumFractionDigits: 4,
   });
   const formatNumber = (n) => numberFormatter.format(n);
+
   const flash = (el) => { el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); };
   const setStatus = (msg) => { if (statusEl) statusEl.textContent = msg || ''; };
   const setInvalid = (el, invalid) => {
@@ -44,14 +45,13 @@ window.addEventListener('DOMContentLoaded', () => {
   const THEME_KEY = 'theme';
   const HISTORY_KEY = 'history';
   const STATE_KEY = 'state';
+
   const applyTheme = (t) => { document.documentElement.setAttribute('data-theme', t); };
   const getSystemPref = () => (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
   const loadTheme = () => localStorage.getItem(THEME_KEY) || getSystemPref();
   const setTheme = (t) => { localStorage.setItem(THEME_KEY, t); applyTheme(t); };
   setTheme(loadTheme());
-  // Botão de alternância de tema:
-  // - Lê o tema atual (dark/light)
-  // - Alterna e salva em localStorage para persistência
+
   if (themeToggle) {
     themeToggle.addEventListener('click', () => {
       const current = document.documentElement.getAttribute('data-theme') || loadTheme();
@@ -60,21 +60,21 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  const loadHistory = () => {
-    try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch { return []; }
-  };
+  // Histórico
+  const loadHistory = () => { try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch { return []; } };
   let history = loadHistory();
-  const saveHistory = () => { localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, 50))); };
+  const saveHistory = () => { localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0,50))); };
   const renderHistory = () => {
     if (!historyList) return;
     historyList.innerHTML = '';
-    history.forEach((text) => {
+    history.forEach(text => {
       const li = document.createElement('li');
       li.textContent = text;
       historyList.appendChild(li);
     });
   };
   renderHistory();
+
   if (clearHistoryBtn) {
     clearHistoryBtn.addEventListener('click', () => {
       history = [];
@@ -83,10 +83,8 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Persistência de valores e unidades
-  const loadState = () => {
-    try { return JSON.parse(localStorage.getItem(STATE_KEY) || '{}'); } catch { return {}; }
-  };
+  // Estado
+  const loadState = () => { try { return JSON.parse(localStorage.getItem(STATE_KEY) || '{}'); } catch { return {}; } };
   const saveState = () => {
     const state = {
       fromValue: fromValue.value,
@@ -97,17 +95,12 @@ window.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem(STATE_KEY, JSON.stringify(state));
   };
   const state = loadState();
-  if (state.fromUnit) fromUnit.value = state.fromUnit;
-  if (state.toUnit) toUnit.value = state.toUnit;
-  if (typeof state.fromValue === 'string') fromValue.value = state.fromValue;
-  if (typeof state.toValue === 'string') toValue.value = state.toValue;
-  // Recalcular se existirem valores
-  if (fromValue.value) {
-    updateOpposite('from');
-  } else if (toValue.value) {
-    updateOpposite('to');
-  }
+  if (state.fromUnit && fromUnit) fromUnit.value = state.fromUnit;
+  if (state.toUnit && toUnit) toUnit.value = state.toUnit;
+  if (state.fromValue && fromValue) fromValue.value = state.fromValue;
+  if (state.toValue && toValue) toValue.value = state.toValue;
 
+  // Atualiza campo oposto
   const updateOpposite = (source) => {
     if (isUpdating) return;
     isUpdating = true;
@@ -116,26 +109,17 @@ window.addEventListener('DOMContentLoaded', () => {
       const to = toUnit.value;
       if (source === 'from') {
         const val = parse(fromValue);
-        if (val === null) {
-          toValue.value = '';
-          setInvalid(fromValue, false);
-          setStatus('');
-        } else if (from === 'K' && val < 0) {
-          toValue.value = '';
-          setInvalid(fromValue, true);
-          setStatus('Temperatura em Kelvin não pode ser negativo.');
-        } else {
+        if (val === null) { toValue.value=''; setInvalid(fromValue,false); setStatus(''); }
+        else if (from === 'K' && val<0) { toValue.value=''; setInvalid(fromValue,true); setStatus('Kelvin não pode ser negativo.'); }
+        else {
           const result = convert(val, from, to);
-          if (to === 'K' && result < 0) {
-            toValue.value = '';
-            setInvalid(fromValue, true);
-            setStatus('Kelvin não pode ser negativo.');
-          } else {
+          if (to==='K' && result<0) { toValue.value=''; setInvalid(fromValue,true); setStatus('Kelvin não pode ser negativo.'); }
+          else {
             toValue.value = formatNumber(result);
-            setInvalid(fromValue, false);
+            setInvalid(fromValue,false);
             setStatus('');
             flash(toValue);
-            if (Number.isFinite(val) && Number.isFinite(result)) {
+            if(Number.isFinite(val) && Number.isFinite(result)) {
               const entry = `${formatNumber(val)} ${from} → ${formatNumber(result)} ${to}`;
               history.unshift(entry);
               saveHistory();
@@ -145,26 +129,17 @@ window.addEventListener('DOMContentLoaded', () => {
         }
       } else {
         const val = parse(toValue);
-        if (val === null) {
-          fromValue.value = '';
-          setInvalid(toValue, false);
-          setStatus('');
-        } else if (to === 'K' && val < 0) {
-          fromValue.value = '';
-          setInvalid(toValue, true);
-          setStatus('Kelvin não pode ser negativo.');
-        } else {
+        if (val === null) { fromValue.value=''; setInvalid(toValue,false); setStatus(''); }
+        else if (to==='K' && val<0) { fromValue.value=''; setInvalid(toValue,true); setStatus('Kelvin não pode ser negativo.'); }
+        else {
           const result = convert(val, to, from);
-          if (from === 'K' && result < 0) {
-            fromValue.value = '';
-            setInvalid(toValue, true);
-            setStatus('Kelvin não pode ser negativo.');
-          } else {
+          if (from==='K' && result<0) { fromValue.value=''; setInvalid(toValue,true); setStatus('Kelvin não pode ser negativo.'); }
+          else {
             fromValue.value = formatNumber(result);
-            setInvalid(toValue, false);
+            setInvalid(toValue,false);
             setStatus('');
             flash(fromValue);
-            if (Number.isFinite(val) && Number.isFinite(result)) {
+            if(Number.isFinite(val) && Number.isFinite(result)) {
               const entry = `${formatNumber(val)} ${to} → ${formatNumber(result)} ${from}`;
               history.unshift(entry);
               saveHistory();
@@ -173,62 +148,35 @@ window.addEventListener('DOMContentLoaded', () => {
           }
         }
       }
-    } finally {
-      isUpdating = false;
-    }
+    } finally { isUpdating=false; }
   };
 
+  // Eventos de input
   fromValue.addEventListener('input', () => { updateOpposite('from'); saveState(); });
   toValue.addEventListener('input', () => { updateOpposite('to'); saveState(); });
-  const recalcOnUnitsChange = () => {
-    const fv = parse(fromValue);
-    const tv = parse(toValue);
-    if (fv !== null) return updateOpposite('from');
-    if (tv !== null) return updateOpposite('to');
-    fromValue.value = '';
-    toValue.value = '';
-    saveState();
-  };
-  fromUnit.addEventListener('change', () => { recalcOnUnitsChange(); saveState(); });
-  toUnit.addEventListener('change', () => { recalcOnUnitsChange(); saveState(); });
+  fromUnit.addEventListener('change', () => { updateOpposite('from'); saveState(); });
+  toUnit.addEventListener('change', () => { updateOpposite('from'); saveState(); });
+
+  // Swap button
   if (swapButton) {
     swapButton.addEventListener('click', () => {
-      if (isUpdating) return;
-      const u1 = fromUnit.value; const u2 = toUnit.value;
-      fromUnit.value = u2; toUnit.value = u1;
-      const v1 = parse(fromValue); const v2 = parse(toValue);
-      if (v1 !== null) {
-        updateOpposite('from');
-      } else if (v2 !== null) {
-        updateOpposite('to');
-      }
+      const tmpUnit = fromUnit.value;
+      fromUnit.value = toUnit.value;
+      toUnit.value = tmpUnit;
+
+      const tmpValue = fromValue.value;
+      fromValue.value = toValue.value;
+      toValue.value = tmpValue;
+
+      if (fromValue.value) updateOpposite('from');
+      else if (toValue.value) updateOpposite('to');
+
       flash(fromValue); flash(toValue);
       saveState();
     });
   }
 
-  // Atalhos de teclado
-  window.addEventListener('keydown', (e) => {
-    if (!e.ctrlKey) return;
-    switch (e.key.toLowerCase()) {
-      case 'i': // Ctrl+I: inverter
-        e.preventDefault();
-        swapButton?.click();
-        break;
-      case 'l': // Ctrl+L: limpar histórico
-        e.preventDefault();
-        clearHistoryBtn?.click();
-        break;
-      case '1': // Ctrl+1: focar origem
-        e.preventDefault();
-        fromValue?.focus();
-        break;
-      case '2': // Ctrl+2: focar destino
-        e.preventDefault();
-        toValue?.focus();
-        break;
-      default:
-        break;
-    }
-  });
-})
+  // Recalcular ao iniciar, se houver valores
+  if (fromValue.value) updateOpposite('from');
+  else if (toValue.value) updateOpposite('to');
+});
