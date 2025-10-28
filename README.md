@@ -1,7 +1,7 @@
 # 🌡️ Conversor de Temperatura
 
 [![Licença: MIT](https://img.shields.io/badge/Licença-MIT-blue.svg)](LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/seu-usuario/conversor-temperatura?style=social)](https://github.com/seu-usuario/conversor-temperatura/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/Theus-TI/Conversor-de-unidades-de-temperatura---Wenderson-e-Matheus-?style=social)](https://github.com/Theus-TI/Conversor-de-unidades-de-temperatura---Wenderson-e-Matheus-/stargazers)
 
 Um conversor de temperatura moderno, responsivo e acessível que permite conversões precisas entre as escalas Celsius, Fahrenheit e Kelvin. Desenvolvido com JavaScript puro, HTML5 e CSS3.
 
@@ -37,8 +37,8 @@ Um conversor de temperatura moderno, responsivo e acessível que permite convers
 
 1. Clone o repositório:
    ```bash
-   git clone https://github.com/seu-usuario/conversor-temperatura.git
-   cd conversor-temperatura
+   git clone https://github.com/Theus-TI/Conversor-de-unidades-de-temperatura---Wenderson-e-Matheus-.git
+   cd Conversor-de-unidades-de-temperatura---Wenderson-e-Matheus-
    ```
 
 2. Abra o arquivo `index.html` no seu navegador ou use um servidor local:
@@ -80,6 +80,18 @@ Distribuído sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais inf
 
 ## ✉️ Contato
 
-Seu Nome - [@seu-usuario](https://twitter.com/seu-usuario) - email@exemplo.com
+Seu Nome - [@Theus-TI](https://github.com/Theus-TI)
 
-Link do Projeto: [https://github.com/seu-usuario/conversor-temperatura](https://github.com/seu-usuario/conversor-temperatura)
+Link do Projeto: [https://github.com/Theus-TI/Conversor-de-unidades-de-temperatura---Wenderson-e-Matheus-](https://github.com/Theus-TI/Conversor-de-unidades-de-temperatura---Wenderson-e-Matheus-)
+
+## ⌨️ Atalhos de Teclado
+
+- Ctrl+I: Inverter unidades
+- Ctrl+L: Limpar histórico de conversões
+- Ctrl+1: Focar campo de origem (valor de entrada)
+- Ctrl+2: Focar campo de destino (valor convertido)
+
+## 🗂️ Histórico e Persistência
+
+- O histórico de conversões é salvo no `localStorage` (até 50 itens).
+- As preferências de tema e o último estado (valores e unidades) também são persistidos no `localStorage`.
