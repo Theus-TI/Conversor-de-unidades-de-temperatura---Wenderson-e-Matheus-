@@ -8,12 +8,16 @@ window.addEventListener('DOMContentLoaded', () => {
   const toUnit = $('#toUnit');
   const swapButton = document.querySelector('#swapButton');
   const statusEl = document.querySelector('#status');
+  const themeToggle = document.querySelector('#themeToggle');
+  const historyList = document.querySelector('#historyList');
+  const clearHistoryBtn = document.querySelector('#clearHistory');
 
   
 
   let isUpdating = false;
   const parse = (el) => {
-    const v = parseFloat(el.value);
+    const raw = (el.value || '').trim().replace(',', '.');
+    const v = parseFloat(raw);
     return Number.isFinite(v) ? v : null;
   };
 
@@ -36,6 +40,70 @@ window.addEventListener('DOMContentLoaded', () => {
       el.removeAttribute('aria-invalid');
     }
   };
+
+  const THEME_KEY = 'theme';
+  const HISTORY_KEY = 'history';
+  const STATE_KEY = 'state';
+  const applyTheme = (t) => { document.documentElement.setAttribute('data-theme', t); };
+  const getSystemPref = () => (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+  const loadTheme = () => localStorage.getItem(THEME_KEY) || getSystemPref();
+  const setTheme = (t) => { localStorage.setItem(THEME_KEY, t); applyTheme(t); };
+  setTheme(loadTheme());
+  if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme') || loadTheme();
+      const next = current === 'dark' ? 'light' : 'dark';
+      setTheme(next);
+    });
+  }
+
+  const loadHistory = () => {
+    try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch { return []; }
+  };
+  let history = loadHistory();
+  const saveHistory = () => { localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, 50))); };
+  const renderHistory = () => {
+    if (!historyList) return;
+    historyList.innerHTML = '';
+    history.forEach((text) => {
+      const li = document.createElement('li');
+      li.textContent = text;
+      historyList.appendChild(li);
+    });
+  };
+  renderHistory();
+  if (clearHistoryBtn) {
+    clearHistoryBtn.addEventListener('click', () => {
+      history = [];
+      saveHistory();
+      renderHistory();
+    });
+  }
+
+  // Persistência de valores e unidades
+  const loadState = () => {
+    try { return JSON.parse(localStorage.getItem(STATE_KEY) || '{}'); } catch { return {}; }
+  };
+  const saveState = () => {
+    const state = {
+      fromValue: fromValue.value,
+      toValue: toValue.value,
+      fromUnit: fromUnit.value,
+      toUnit: toUnit.value,
+    };
+    localStorage.setItem(STATE_KEY, JSON.stringify(state));
+  };
+  const state = loadState();
+  if (state.fromUnit) fromUnit.value = state.fromUnit;
+  if (state.toUnit) toUnit.value = state.toUnit;
+  if (typeof state.fromValue === 'string') fromValue.value = state.fromValue;
+  if (typeof state.toValue === 'string') toValue.value = state.toValue;
+  // Recalcular se existirem valores
+  if (fromValue.value) {
+    updateOpposite('from');
+  } else if (toValue.value) {
+    updateOpposite('to');
+  }
 
   const updateOpposite = (source) => {
     if (isUpdating) return;
@@ -64,6 +132,12 @@ window.addEventListener('DOMContentLoaded', () => {
             setInvalid(fromValue, false);
             setStatus('');
             flash(toValue);
+            if (Number.isFinite(val) && Number.isFinite(result)) {
+              const entry = `${formatNumber(val)} ${from} → ${formatNumber(result)} ${to}`;
+              history.unshift(entry);
+              saveHistory();
+              renderHistory();
+            }
           }
         }
       } else {
@@ -87,6 +161,12 @@ window.addEventListener('DOMContentLoaded', () => {
             setInvalid(toValue, false);
             setStatus('');
             flash(fromValue);
+            if (Number.isFinite(val) && Number.isFinite(result)) {
+              const entry = `${formatNumber(val)} ${to} → ${formatNumber(result)} ${from}`;
+              history.unshift(entry);
+              saveHistory();
+              renderHistory();
+            }
           }
         }
       }
@@ -95,8 +175,8 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  fromValue.addEventListener('input', () => updateOpposite('from'));
-  toValue.addEventListener('input', () => updateOpposite('to'));
+  fromValue.addEventListener('input', () => { updateOpposite('from'); saveState(); });
+  toValue.addEventListener('input', () => { updateOpposite('to'); saveState(); });
   const recalcOnUnitsChange = () => {
     const fv = parse(fromValue);
     const tv = parse(toValue);
@@ -104,9 +184,10 @@ window.addEventListener('DOMContentLoaded', () => {
     if (tv !== null) return updateOpposite('to');
     fromValue.value = '';
     toValue.value = '';
+    saveState();
   };
-  fromUnit.addEventListener('change', recalcOnUnitsChange);
-  toUnit.addEventListener('change', recalcOnUnitsChange);
+  fromUnit.addEventListener('change', () => { recalcOnUnitsChange(); saveState(); });
+  toUnit.addEventListener('change', () => { recalcOnUnitsChange(); saveState(); });
   if (swapButton) {
     swapButton.addEventListener('click', () => {
       if (isUpdating) return;
@@ -119,6 +200,32 @@ window.addEventListener('DOMContentLoaded', () => {
         updateOpposite('to');
       }
       flash(fromValue); flash(toValue);
+      saveState();
     });
   }
+
+  // Atalhos de teclado
+  window.addEventListener('keydown', (e) => {
+    if (!e.ctrlKey) return;
+    switch (e.key.toLowerCase()) {
+      case 'i': // Ctrl+I: inverter
+        e.preventDefault();
+        swapButton?.click();
+        break;
+      case 'l': // Ctrl+L: limpar histórico
+        e.preventDefault();
+        clearHistoryBtn?.click();
+        break;
+      case '1': // Ctrl+1: focar origem
+        e.preventDefault();
+        fromValue?.focus();
+        break;
+      case '2': // Ctrl+2: focar destino
+        e.preventDefault();
+        toValue?.focus();
+        break;
+      default:
+        break;
+    }
+  });
 })
