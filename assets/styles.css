@@ -29,7 +29,7 @@ input.invalid{border-color:var(--error)}
 [data-theme="light"]{--bg:#f8fafc;--fg:#0f172a;--accent:#cf3434;--muted:#475569;--error:#b91c1c}
 [data-theme="dark"]{--bg:#0f172a;--fg:#e2e8f0;--accent:#22d3ee;--muted:#94a3b8;--error:#ef4444}
 
-.theme-btn{cursor:pointer;margin-top:12px;padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:transparent;color:var(--fg)}
+.theme-btn{cursor:pointer;margin-top:12px;padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:transparent;color:var(--fg); transition: background 0.3s, color 0.3s;}
 .theme-btn:hover{background:rgba(255,255,255,.06)}
 
 /* histórico */
