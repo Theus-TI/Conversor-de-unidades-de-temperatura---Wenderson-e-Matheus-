@@ -8,6 +8,9 @@ window.addEventListener('DOMContentLoaded', () => {
   const toUnit = $('#toUnit');
   const swapButton = document.querySelector('#swapButton');
   const statusEl = document.querySelector('#status');
+  const themeToggle = document.querySelector('#themeToggle');
+  const historyList = document.querySelector('#historyList');
+  const clearHistoryBtn = document.querySelector('#clearHistory');
 
   
 
@@ -37,6 +40,44 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  const THEME_KEY = 'theme';
+  const HISTORY_KEY = 'history';
+  const applyTheme = (t) => { document.documentElement.setAttribute('data-theme', t); };
+  const getSystemPref = () => (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+  const loadTheme = () => localStorage.getItem(THEME_KEY) || getSystemPref();
+  const setTheme = (t) => { localStorage.setItem(THEME_KEY, t); applyTheme(t); };
+  setTheme(loadTheme());
+  if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme') || loadTheme();
+      const next = current === 'dark' ? 'light' : 'dark';
+      setTheme(next);
+    });
+  }
+
+  const loadHistory = () => {
+    try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch { return []; }
+  };
+  let history = loadHistory();
+  const saveHistory = () => { localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, 50))); };
+  const renderHistory = () => {
+    if (!historyList) return;
+    historyList.innerHTML = '';
+    history.forEach((text) => {
+      const li = document.createElement('li');
+      li.textContent = text;
+      historyList.appendChild(li);
+    });
+  };
+  renderHistory();
+  if (clearHistoryBtn) {
+    clearHistoryBtn.addEventListener('click', () => {
+      history = [];
+      saveHistory();
+      renderHistory();
+    });
+  }
+
   const updateOpposite = (source) => {
     if (isUpdating) return;
     isUpdating = true;
@@ -64,6 +105,12 @@ window.addEventListener('DOMContentLoaded', () => {
             setInvalid(fromValue, false);
             setStatus('');
             flash(toValue);
+            if (Number.isFinite(val) && Number.isFinite(result)) {
+              const entry = `${formatNumber(val)} ${from} → ${formatNumber(result)} ${to}`;
+              history.unshift(entry);
+              saveHistory();
+              renderHistory();
+            }
           }
         }
       } else {
@@ -87,6 +134,12 @@ window.addEventListener('DOMContentLoaded', () => {
             setInvalid(toValue, false);
             setStatus('');
             flash(fromValue);
+            if (Number.isFinite(val) && Number.isFinite(result)) {
+              const entry = `${formatNumber(val)} ${to} → ${formatNumber(result)} ${from}`;
+              history.unshift(entry);
+              saveHistory();
+              renderHistory();
+            }
           }
         }
       }

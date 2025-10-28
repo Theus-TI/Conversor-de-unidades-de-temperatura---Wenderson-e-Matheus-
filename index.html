@@ -9,7 +9,8 @@
 </head>
 <body>
   <header class="app-header">
-    <h1>Conversor de Temperatura <span class="badge" aria-label="Versão">v1.0.0</span></h1>
+    <h1>Conversor de Temperatura <span class="badge" aria-label="Versão">v1.1.0</span></h1>
+    <button id="themeToggle" class="theme-btn" type="button" aria-label="Alternar tema">🌓 Tema</button>
   </header>
   <main class="container">
     <section class="panel">
@@ -46,6 +47,13 @@
       </div>
     </section>
   </main>
+  <section class="history" aria-labelledby="historyTitle">
+    <div class="history-header">
+      <h2 id="historyTitle">Histórico de Conversões</h2>
+      <button id="clearHistory" class="clear-btn" type="button" aria-label="Limpar histórico">Limpar</button>
+    </div>
+    <ol id="historyList" class="history-list"></ol>
+  </section>
   <div id="status" class="status" aria-live="polite" role="status"></div>
   <script type="module" src="./src/app.js"></script>
 </body>
