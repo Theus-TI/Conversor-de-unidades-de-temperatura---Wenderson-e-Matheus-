@@ -4,7 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Conversor de temperatura entre Celsius, Fahrenheit e Kelvin. Sem backend. Responsivo e acessível.">
+  <meta name="theme-color" content="#0f172a">
   <title>Conversor de Temperatura</title>
+  <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg">
   <link rel="stylesheet" href="./assets/styles.css">
 </head>
 <body>
@@ -17,7 +19,7 @@
       <h2 class="sr-only">De</h2>
       <div class="field">
         <label for="fromValue">Valor</label>
-        <input id="fromValue" type="number" inputmode="decimal" autocomplete="off">
+        <input id="fromValue" type="number" step="any" inputmode="decimal" autocomplete="off" placeholder="Ex.: 25,5">
       </div>
       <div class="field">
         <label for="fromUnit">Unidade</label>
@@ -35,7 +37,7 @@
       <h2 class="sr-only">Para</h2>
       <div class="field">
         <label for="toValue">Valor</label>
-        <input id="toValue" type="number" inputmode="decimal" autocomplete="off">
+        <input id="toValue" type="number" step="any" inputmode="decimal" autocomplete="off" placeholder="Resultado">
       </div>
       <div class="field">
         <label for="toUnit">Unidade</label>
