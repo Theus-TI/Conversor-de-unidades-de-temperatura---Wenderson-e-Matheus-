@@ -37,6 +37,11 @@ input.invalid{border-color:var(--error)}
 .history-header{display:flex;justify-content:space-between;align-items:center;margin:8px 0}
 .history-list{margin:0;padding-left:20px;display:grid;gap:6px}
 .history-list li{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:8px 12px}
+/* .history-list li:hover {
+  background: rgba(255,255,255,.08);
+  transform: scale(1.01);
+  transition: all 0.15s ease-in-out;
+} */
 .clear-btn{cursor:pointer;padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:transparent;color:var(--fg)}
 .clear-btn:hover{background:rgba(255,255,255,.06)}
 
