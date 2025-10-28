@@ -16,7 +16,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
   let isUpdating = false;
   const parse = (el) => {
-    const v = parseFloat(el.value);
+    const raw = (el.value || '').trim().replace(',', '.');
+    const v = parseFloat(raw);
     return Number.isFinite(v) ? v : null;
   };
 
@@ -174,4 +175,29 @@ window.addEventListener('DOMContentLoaded', () => {
       flash(fromValue); flash(toValue);
     });
   }
+
+  // Atalhos de teclado
+  window.addEventListener('keydown', (e) => {
+    if (!e.ctrlKey) return;
+    switch (e.key.toLowerCase()) {
+      case 'i': // Ctrl+I: inverter
+        e.preventDefault();
+        swapButton?.click();
+        break;
+      case 'l': // Ctrl+L: limpar histórico
+        e.preventDefault();
+        clearHistoryBtn?.click();
+        break;
+      case '1': // Ctrl+1: focar origem
+        e.preventDefault();
+        fromValue?.focus();
+        break;
+      case '2': // Ctrl+2: focar destino
+        e.preventDefault();
+        toValue?.focus();
+        break;
+      default:
+        break;
+    }
+  });
 })
