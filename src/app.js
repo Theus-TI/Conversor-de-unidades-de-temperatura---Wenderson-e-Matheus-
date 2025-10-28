@@ -43,6 +43,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   const THEME_KEY = 'theme';
   const HISTORY_KEY = 'history';
+  const STATE_KEY = 'state';
   const applyTheme = (t) => { document.documentElement.setAttribute('data-theme', t); };
   const getSystemPref = () => (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
   const loadTheme = () => localStorage.getItem(THEME_KEY) || getSystemPref();
@@ -77,6 +78,31 @@ window.addEventListener('DOMContentLoaded', () => {
       saveHistory();
       renderHistory();
     });
+  }
+
+  // Persistência de valores e unidades
+  const loadState = () => {
+    try { return JSON.parse(localStorage.getItem(STATE_KEY) || '{}'); } catch { return {}; }
+  };
+  const saveState = () => {
+    const state = {
+      fromValue: fromValue.value,
+      toValue: toValue.value,
+      fromUnit: fromUnit.value,
+      toUnit: toUnit.value,
+    };
+    localStorage.setItem(STATE_KEY, JSON.stringify(state));
+  };
+  const state = loadState();
+  if (state.fromUnit) fromUnit.value = state.fromUnit;
+  if (state.toUnit) toUnit.value = state.toUnit;
+  if (typeof state.fromValue === 'string') fromValue.value = state.fromValue;
+  if (typeof state.toValue === 'string') toValue.value = state.toValue;
+  // Recalcular se existirem valores
+  if (fromValue.value) {
+    updateOpposite('from');
+  } else if (toValue.value) {
+    updateOpposite('to');
   }
 
   const updateOpposite = (source) => {
@@ -149,8 +175,8 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  fromValue.addEventListener('input', () => updateOpposite('from'));
-  toValue.addEventListener('input', () => updateOpposite('to'));
+  fromValue.addEventListener('input', () => { updateOpposite('from'); saveState(); });
+  toValue.addEventListener('input', () => { updateOpposite('to'); saveState(); });
   const recalcOnUnitsChange = () => {
     const fv = parse(fromValue);
     const tv = parse(toValue);
@@ -158,9 +184,10 @@ window.addEventListener('DOMContentLoaded', () => {
     if (tv !== null) return updateOpposite('to');
     fromValue.value = '';
     toValue.value = '';
+    saveState();
   };
-  fromUnit.addEventListener('change', recalcOnUnitsChange);
-  toUnit.addEventListener('change', recalcOnUnitsChange);
+  fromUnit.addEventListener('change', () => { recalcOnUnitsChange(); saveState(); });
+  toUnit.addEventListener('change', () => { recalcOnUnitsChange(); saveState(); });
   if (swapButton) {
     swapButton.addEventListener('click', () => {
       if (isUpdating) return;
@@ -173,6 +200,7 @@ window.addEventListener('DOMContentLoaded', () => {
         updateOpposite('to');
       }
       flash(fromValue); flash(toValue);
+      saveState();
     });
   }
 
