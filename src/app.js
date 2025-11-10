@@ -180,3 +180,9 @@ window.addEventListener('DOMContentLoaded', () => {
   if (fromValue.value) updateOpposite('from');
   else if (toValue.value) updateOpposite('to');
 });
+
+const alertBtn = document.getElementById("alert-btn");
+
+alertBtn.addEventListener('click', () => {
+  alert();
+})
